@@ -205,3 +205,62 @@ cython_debug/
 marimo/_static/
 marimo/_lsp/
 __marimo__/
+
+# ===== Frontend (Node / Next.js) =====
+node_modules/
+.next/
+.turbo/
+out/
+*.tsbuildinfo
+.pnpm-store/
+.yarn/*
+!.yarn/patches
+!.yarn/plugins
+!.yarn/releases
+!.yarn/sdks
+!.yarn/versions
+
+# ===== Env files (全匹配，只放行 example 模板) =====
+# 所有 .env 变体一律忽略
+.env
+.env.*
+# 例外：允许提交模板
+!.env.example
+!.env.*.example
+!.env.sample
+!.env.template
+
+# ===== Data / Cache =====
+data/
+*.duckdb
+*.duckdb.wal
+.cache/
+
+# ===== Secrets (belt-and-suspenders) =====
+*.pem
+*.key
+*.p12
+*.pfx
+*.crt
+*.cer
+credentials*.json
+service-account*.json
+*.secret
+secrets/
+.secrets/
+
+# API key 文件（防止手滑）
+*api_key*
+*apikey*
+!*.example*
+
+# ===== OS / Editor =====
+.DS_Store
+Thumbs.db
+.idea/
+# 只提交共享的 vscode 配置，忽略个人偏好
+.vscode/*
+!.vscode/launch.json
+!.vscode/tasks.json
+!.vscode/settings.json
+!.vscode/extensions.json

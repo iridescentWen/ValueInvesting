@@ -1,0 +1,48 @@
+[project]
+name = "valueinvesting-backend"
+version = "0.1.0"
+description = "AI agent backend for value investing (FastAPI + Pydantic AI)"
+readme = "README.md"
+requires-python = ">=3.12"
+dependencies = [
+    "fastapi>=0.115",
+    "uvicorn[standard]>=0.32",
+    "pydantic>=2.9",
+    "pydantic-settings>=2.6",
+    "pydantic-ai>=0.0.14",
+    "sqlalchemy[asyncio]>=2.0",
+    "psycopg[binary]>=3.2",
+    "redis>=5.2",
+    "arq>=0.26",
+    "duckdb>=1.1",
+    "httpx>=0.28",
+    "sse-starlette>=2.1",
+]
+
+# 数据源依赖较重（AkShare 拉 pandas、yfinance 拉 lxml 等）。
+# 按市场分组，实现对应 provider 时再装：uv sync --extra cn / --extra us
+[project.optional-dependencies]
+cn = ["akshare>=1.15"]
+us = ["yfinance>=0.2.50"]
+
+[dependency-groups]
+dev = [
+    "pytest>=8.3",
+    "pytest-asyncio>=0.24",
+    "ruff>=0.8",
+    "mypy>=1.13",
+]
+
+[tool.uv]
+package = false
+
+[tool.ruff]
+line-length = 100
+target-version = "py312"
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "UP", "B", "SIM"]
+
+[tool.pytest.ini_options]
+asyncio_mode = "auto"
+testpaths = ["tests"]
