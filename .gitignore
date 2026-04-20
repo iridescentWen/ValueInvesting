@@ -231,7 +231,10 @@ out/
 !.env.template
 
 # ===== Data / Cache =====
-data/
+# 仅忽略 repo 根和 backend 根下的 data/（DuckDB / parquet 缓存），
+# 不要匹配 `backend/app/data/`（代码目录）
+/data/
+/backend/data/
 *.duckdb
 *.duckdb.wal
 .cache/

@@ -53,5 +53,7 @@
 
   "terminal.integrated.env.osx": {
     "PYTHONPATH": "${workspaceFolder}/backend"
-  }
+  },
+
+  "debug.javascript.autoAttachFilter": "disabled"
 }

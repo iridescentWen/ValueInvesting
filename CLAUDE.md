@@ -51,7 +51,7 @@ npm run lint
 
 ### Both at once
 
-Use the VS Code / Cursor compound launch **"All: Backend + Frontend"** (see `.vscode/launch.json`), or run two terminals.
+Run the VS Code / Cursor task **"All: Dev (backend + frontend)"** (see `.vscode/tasks.json`), or run two terminals. For debugging the backend, use the **"Backend: FastAPI (uvicorn)"** launch config and start the frontend as a task on the side.
 
 ## Architecture — non-obvious pieces
 

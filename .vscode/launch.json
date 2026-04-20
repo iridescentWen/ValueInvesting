@@ -41,30 +41,6 @@
       "python": "${workspaceFolder}/backend/.venv/bin/python",
       "console": "integratedTerminal",
       "justMyCode": false
-    },
-    {
-      "name": "Frontend: Next.js (server)",
-      "type": "node-terminal",
-      "request": "launch",
-      "command": "npm run dev",
-      "cwd": "${workspaceFolder}/frontend"
-    },
-    {
-      "name": "Frontend: Next.js (client in Chrome)",
-      "type": "chrome",
-      "request": "launch",
-      "url": "http://localhost:8420",
-      "webRoot": "${workspaceFolder}/frontend"
-    }
-  ],
-  "compounds": [
-    {
-      "name": "All: Backend + Frontend",
-      "configurations": [
-        "Backend: FastAPI (uvicorn)",
-        "Frontend: Next.js (server)"
-      ],
-      "stopAll": true
     }
   ]
 }

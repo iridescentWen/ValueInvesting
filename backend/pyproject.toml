@@ -17,6 +17,8 @@ dependencies = [
     "duckdb>=1.1",
     "httpx>=0.28",
     "sse-starlette>=2.1",
+    "alembic>=1.18.4",
+    "python-frontmatter>=1.1.0",
 ]
 
 # 数据源依赖较重（AkShare 拉 pandas、yfinance 拉 lxml 等）。
