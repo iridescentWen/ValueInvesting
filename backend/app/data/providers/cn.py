@@ -88,6 +88,7 @@ class CnProvider(MarketDataProvider):
             self._mr = MairuiClient(
                 api_key=settings.mairui_api_key,
                 base_url=settings.mairui_base_url,
+                rate_per_min=settings.mairui_rate_per_min,
             )
         else:
             self._mr = None

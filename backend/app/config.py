@@ -45,6 +45,14 @@ class Settings(BaseSettings):
     # Mairui（A 股财务指标——cwzb 接口：混合营收 / 利润 / 资产 / 比率）
     mairui_api_key: str | None = None
     mairui_base_url: str = "http://api.mairui.club"
+    # Mairui 客户端限速:token bucket，每分钟最多 N 次请求。套餐对照:
+    #   免费        50/天  (无法扫全市场,不要用)
+    #   月卡/年卡    300/min (→ 保守配 240)
+    #   铂金       3000/min (→ 保守配 2400)
+    #   钻石       6000/min (→ 保守配 4800)
+    # 默认 240 对应最便宜付费套餐,冷启动全 A 股 ~22 分钟。通过环境变量
+    # MAIRUI_RATE_PER_MIN 调高。
+    mairui_rate_per_min: int = 240
 
     database_url: str = ""
     redis_url: str = "redis://localhost:6379/0"

@@ -47,8 +47,6 @@ log = logging.getLogger(__name__)
 router = APIRouter(prefix="/api", tags=["screener"])
 
 _ENRICH_CONCURRENCY = 16
-_CN_COARSE_TOP_N = 80
-_HK_COARSE_TOP_N = 80
 # FMP screener 服务端预筛已经很准,5000 条足够覆盖全投资级美股
 _US_CANDIDATE_LIMIT = 5000
 # 粗筛阈值放得比最终阈值宽,给 ROE 闸门留余地(最终 filter 再卡一次)
@@ -121,10 +119,15 @@ def _infer_cn_exchange(code: str) -> str | None:
 
 async def _cn_candidates(provider: CnProvider) -> list[ScreenerCandidate]:
     """CN: 全 A 股 universe(~5200 支)→ Mairui realtime 并发粗筛 PE/PB/MC
-    → 取 Graham # 最小的 top-N → 补 ROE / 股息率。
+    → 全部粗筛幸存者进 ROE / 股息率 enrich。
 
     冷启动:5200 支 × per-stock realtime,Semaphore(16) 下约 60-90s。全量
     名单和 realtime 结果都可以挂 24h TTL,后续请求 ~无感。
+
+    粗筛阈值比最终 apply_filter 宽(PE≤30/PB≤5/GN≤50)——目的是在 ROE 闸门
+    生效前先剔除明显不合格股,省 enrich 工作量。最终过滤仍由 apply_filter
+    统一执行。这里不再按 Graham # 截断前 N,否则上交所巨头(工商银行等)会在
+    Mairui realtime 局部缺字段的情况下被整板块扫掉,结果严重偏 000xxx。
     """
     mairui = provider._mr
     if mairui is None:
@@ -135,6 +138,8 @@ async def _cn_candidates(provider: CnProvider) -> list[ScreenerCandidate]:
     log.info("cn screener: universe=%d", len(universe))
 
     sem = asyncio.Semaphore(_ENRICH_CONCURRENCY)
+    # 观测:静默失败要可见,不然下次又是"结果怎么这么少"的谜案
+    errors = {"mairui": 0, "missing_fields": 0, "bad_values": 0, "coarse_drop": 0}
 
     async def fetch_coarse(
         stock: Stock,
@@ -145,28 +150,37 @@ async def _cn_candidates(provider: CnProvider) -> list[ScreenerCandidate]:
                 info = await mairui.get_realtime(stock.symbol)
         except Exception as e:  # noqa: BLE001 — Mairui 限流/网络抖动不固定
             log.debug("cn screener: Mairui get_realtime failed for %s: %s", stock.symbol, e)
+            errors["mairui"] += 1
             return None
         pe = _dec(info.get("pe"))
         pb = _dec(info.get("sjl"))
         mc = _dec(info.get("sz"))
         if pe is None or pb is None or mc is None:
+            errors["missing_fields"] += 1
             return None
         if pe <= 0 or pb <= 0:
+            errors["bad_values"] += 1
             return None
         # 粗筛阈值比最终宽——最终 apply_filter 再卡一次
         if pe > Decimal(30) or pb > Decimal(5):
+            errors["coarse_drop"] += 1
             return None
         if mc < MARKET_CAP_MIN:
+            errors["coarse_drop"] += 1
             return None
         if pe * pb > GRAHAM_NUMBER_MAX + Decimal(20):
+            errors["coarse_drop"] += 1
             return None
         return (stock, pe, pb, mc)
 
     coarse = await asyncio.gather(*[fetch_coarse(s) for s in universe])
     rows: list[tuple[Stock, Decimal, Decimal, Decimal]] = [r for r in coarse if r is not None]
-    rows.sort(key=lambda x: x[1] * x[2])
-    rows = rows[:_CN_COARSE_TOP_N]
-    log.info("cn screener: coarse_passed=%d top_n=%d", len(coarse), len(rows))
+    log.info(
+        "cn screener: universe=%d coarse_passed=%d mairui_err=%d missing=%d bad=%d coarse_drop=%d",
+        len(universe), len(rows),
+        errors["mairui"], errors["missing_fields"],
+        errors["bad_values"], errors["coarse_drop"],
+    )
 
     async def enrich_one(row: tuple[Stock, Decimal, Decimal, Decimal]) -> ScreenerCandidate:
         stock, pe, pb, mc = row
@@ -281,12 +295,10 @@ async def _hk_candidates(provider: HkProvider) -> list[ScreenerCandidate]:
 
     results = await asyncio.gather(*[enrich_one(s) for s in universe])
     candidates = [c for c in results if c is not None]
-    log.info("hk screener: coarse_passed=%d", len(candidates))
-    # 按 Graham # 排序取 top-N(减少下游不必要的工作)
-    candidates.sort(
-        key=lambda c: (c.pe or Decimal(999)) * (c.pb or Decimal(999))
-    )
-    return candidates[:_HK_COARSE_TOP_N]
+    log.info("hk screener: universe=%d coarse_passed=%d", len(universe), len(candidates))
+    # 全部粗筛幸存者进 apply_filter,不按 Graham # 截断 top-N;yfinance 对 HK
+    # 不同代号段的稳定性差异会让截断结果严重偏向某板块
+    return candidates
 
 
 # ======== 端点 ========

@@ -29,7 +29,6 @@ export default function StockDetailPage({
 }: {
   params: Promise<{ ticker: string }>;
 }) {
-  const t = useT();
   const { ticker } = use(params);
   const search = useSearchParams();
   const marketParam = search.get("market");

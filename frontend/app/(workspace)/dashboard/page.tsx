@@ -1,5 +1,6 @@
 "use client";
 
+import { useRouter } from "next/navigation";
 import { useCallback, useEffect, useRef, useState } from "react";
 
 import { Button } from "@/components/ui/button";
@@ -11,32 +12,8 @@ import {
 } from "@/components/ui/tooltip";
 import { useT } from "@/lib/i18n";
 import { fetchScreener, type ScreenerRow } from "@/lib/api";
+import { fmtMarketCap, fmtNum, fmtPct } from "@/lib/fmt";
 import { useAppStore, type Market } from "@/lib/store";
-
-function fmtNum(v: string | null, digits = 2): string {
-  if (v === null) return "—";
-  const n = Number(v);
-  if (!Number.isFinite(n)) return "—";
-  return n.toFixed(digits);
-}
-
-function fmtPct(v: string | null, digits = 2): string {
-  if (v === null) return "—";
-  const n = Number(v);
-  if (!Number.isFinite(n)) return "—";
-  return `${(n * 100).toFixed(digits)}%`;
-}
-
-function fmtMarketCap(v: string | null, market: Market): string {
-  if (v === null) return "—";
-  const n = Number(v);
-  if (!Number.isFinite(n) || n === 0) return "—";
-  const symbol = market === "us" ? "$" : market === "hk" ? "HK$" : "¥";
-  if (n >= 1e12) return `${symbol}${(n / 1e12).toFixed(2)}T`;
-  if (n >= 1e9) return `${symbol}${(n / 1e9).toFixed(2)}B`;
-  if (n >= 1e6) return `${symbol}${(n / 1e6).toFixed(2)}M`;
-  return `${symbol}${n.toFixed(0)}`;
-}
 
 function fmtRelative(ts: Date | null, neverLabel: string): string {
   if (ts === null) return neverLabel;
@@ -51,6 +28,7 @@ function fmtRelative(ts: Date | null, neverLabel: string): string {
 
 export default function DashboardPage() {
   const t = useT();
+  const router = useRouter();
   const market = useAppStore((s) => s.market);
   // rows 按市场分桶存——切换市场时直接展示上一份对应的缓存,避免 "A 股数据显示
   // 成港股" 的错位
@@ -179,7 +157,16 @@ export default function DashboardPage() {
                   rows.map((r) => (
                     <tr
                       key={r.symbol}
-                      className={`border-b last:border-b-0 hover:bg-muted/30 ${
+                      onClick={(e) => {
+                        const url = `/stock/${encodeURIComponent(r.symbol)}?market=${market}`;
+                        // cmd/ctrl/middle-click → 新标签;否则同标签跳转
+                        if (e.metaKey || e.ctrlKey) {
+                          window.open(url, "_blank");
+                        } else {
+                          router.push(url);
+                        }
+                      }}
+                      className={`cursor-pointer border-b last:border-b-0 hover:bg-muted/50 ${
                         fetching ? "opacity-60 transition-opacity" : ""
                       }`}
                     >

@@ -241,13 +241,13 @@ async def test_compute_screener_empty_does_not_poison_cache(monkeypatch) -> None
 
 
 @pytest.mark.asyncio
-async def test_cn_candidates_calls_enrich_with_coarse_top_n(monkeypatch) -> None:
-    """enrich 只应该对粗筛后 top N 跑,不是对整个 universe 跑。"""
-    from app.api import screener as screener_mod
+async def test_cn_candidates_enriches_all_coarse_survivors() -> None:
+    """粗筛幸存者全部进 enrich——不按 Graham # 截断 top-N。
 
-    # 3 支全部粗筛通过,但把 top_n 限到 2,enrich 只应该跑 2 次
-    monkeypatch.setattr(screener_mod, "_CN_COARSE_TOP_N", 2)
-
+    之前版本按 PE×PB 升序只保留前 N 支,导致 Mairui realtime 对上交所
+    部分股字段缺失时,板块分布严重偏 000xxx 深主板(一支上交所银行股都
+    没有)。apply_filter 的最终闸门必须对所有粗筛幸存者平等生效。
+    """
     provider = _make_provider(
         [
             _stock("600519", "贵州茅台", "SH"),
@@ -255,9 +255,9 @@ async def test_cn_candidates_calls_enrich_with_coarse_top_n(monkeypatch) -> None
             _stock("601318", "中国平安", "SH"),
         ],
         {
-            "600519": {"pe": 20, "sjl": 2, "sz": 1e12},    # GN=40
-            "600036": {"pe": 6.5, "sjl": 1.0, "sz": 9e11}, # GN=6.5  ← 最便宜
-            "601318": {"pe": 10, "sjl": 1.5, "sz": 8e11},  # GN=15
+            "600519": {"pe": 20, "sjl": 2, "sz": 1e12},    # GN=40, 粗筛 GN 上限 50,通过
+            "600036": {"pe": 6.5, "sjl": 1.0, "sz": 9e11}, # GN=6.5,通过
+            "601318": {"pe": 10, "sjl": 1.5, "sz": 8e11},  # GN=15,通过
         },
     )
 
@@ -271,8 +271,8 @@ async def test_cn_candidates_calls_enrich_with_coarse_top_n(monkeypatch) -> None
     provider.enrich_fundamentals = _spy_enrich  # type: ignore[method-assign]
 
     candidates = await _cn_candidates(provider)
-    # top_n=2 意味着只对 GN 最小的两支(招行 + 平安)调 enrich
-    assert set(enrich_calls) == {"600036", "601318"}
-    assert len(candidates) == 2
-    assert all(c.symbol in {"600036", "601318"} for c in candidates)
+    # 3 支全部粗筛通过 → 3 支全部 enrich,不再有 top-N 截断
+    assert set(enrich_calls) == {"600519", "600036", "601318"}
+    assert len(candidates) == 3
+    assert {c.symbol for c in candidates} == {"600519", "600036", "601318"}
     assert all(isinstance(date.today(), date) for _ in candidates)
