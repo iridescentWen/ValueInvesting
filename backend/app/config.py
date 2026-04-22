@@ -57,6 +57,9 @@ class Settings(BaseSettings):
     database_url: str = ""
     redis_url: str = "redis://localhost:6379/0"
     duckdb_path: Path = Path("./data/analytics.duckdb")
+    # screener prewarm 结果落盘路径。开发期 uvicorn --reload 每次重启都清空
+    # in-memory cache,CN 冷启动 22 分钟——存磁盘重启能跳过 prewarm。
+    screener_cache_path: Path = Path("./data/screener_cache.json")
 
     log_level: str = "INFO"
     env: str = "development"

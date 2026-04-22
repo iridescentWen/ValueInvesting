@@ -11,7 +11,12 @@ import {
   TooltipTrigger,
 } from "@/components/ui/tooltip";
 import { useT } from "@/lib/i18n";
-import { fetchScreener, type ScreenerRow } from "@/lib/api";
+import {
+  fetchScreener,
+  fetchScreenerStatus,
+  type ScreenerPrewarmStatus,
+  type ScreenerRow,
+} from "@/lib/api";
 import { fmtMarketCap, fmtNum, fmtPct } from "@/lib/fmt";
 import { useAppStore, type Market } from "@/lib/store";
 
@@ -26,6 +31,12 @@ function fmtRelative(ts: Date | null, neverLabel: string): string {
   return `${hr}h`;
 }
 
+function interpolate(tpl: string, vars: Record<string, string | number>): string {
+  return tpl.replace(/\{(\w+)\}/g, (_, k) => String(vars[k] ?? ""));
+}
+
+const STATUS_POLL_MS = 2000;
+
 export default function DashboardPage() {
   const t = useT();
   const router = useRouter();
@@ -38,43 +49,145 @@ export default function DashboardPage() {
   const [updatedByMarket, setUpdatedByMarket] = useState<
     Partial<Record<Market, Date>>
   >({});
-  const [fetching, setFetching] = useState(false);
+  const [progressByMarket, setProgressByMarket] = useState<
+    Partial<Record<Market, ScreenerPrewarmStatus>>
+  >({});
   const [error, setError] = useState<string | null>(null);
+  // 每次 load 单调递增,用于丢弃过期请求
   const reqIdRef = useRef(0);
+  // 当前在跑的 status 轮询 interval id;切市场 / ready / 失败都清掉
+  const pollRef = useRef<number | null>(null);
 
   const rows = rowsByMarket[market] ?? [];
   const lastUpdated = updatedByMarket[market] ?? null;
+  const progress = progressByMarket[market] ?? null;
   const hasData = rows.length > 0;
+  const warming = progress?.status === "warming" || progress?.status === "idle";
 
-  const load = useCallback(
-    (targetMarket: Market, refresh: boolean) => {
-      const myReqId = ++reqIdRef.current;
-      setFetching(true);
-      setError(null);
-      fetchScreener(targetMarket, 20, refresh)
-        .then((data) => {
-          // 丢弃过期请求结果——市场切换或连点刷新时只认最后一个
-          if (myReqId !== reqIdRef.current) return;
-          setRowsByMarket((prev) => ({ ...prev, [targetMarket]: data }));
-          setUpdatedByMarket((prev) => ({ ...prev, [targetMarket]: new Date() }));
-        })
-        .catch((e: unknown) => {
-          if (myReqId !== reqIdRef.current) return;
-          setError(e instanceof Error ? e.message : String(e));
-        })
-        .finally(() => {
-          if (myReqId !== reqIdRef.current) return;
-          setFetching(false);
-        });
+  const stopPolling = useCallback(() => {
+    if (pollRef.current !== null) {
+      window.clearInterval(pollRef.current);
+      pollRef.current = null;
+    }
+  }, []);
+
+  const loadRows = useCallback(
+    async (targetMarket: Market, reqId: number): Promise<boolean> => {
+      // 真正拉 rows——仅在 status=ready 时调用。返回 true 表示取到了数据。
+      const resp = await fetchScreener(targetMarket, 20, false);
+      if (reqId !== reqIdRef.current) return false;
+      if (resp.kind === "ready") {
+        setRowsByMarket((prev) => ({ ...prev, [targetMarket]: resp.rows }));
+        setUpdatedByMarket((prev) => ({ ...prev, [targetMarket]: new Date() }));
+        setProgressByMarket((prev) => ({
+          ...prev,
+          [targetMarket]: { status: "ready", done: 0, total: 0, started_at: null, error: null },
+        }));
+        return true;
+      }
+      setProgressByMarket((prev) => ({ ...prev, [targetMarket]: resp.progress }));
+      return false;
     },
     [],
   );
 
-  useEffect(() => {
-    load(market, false);
-  }, [market, load]);
+  const startPolling = useCallback(
+    (targetMarket: Market, reqId: number) => {
+      stopPolling();
+      const tick = async () => {
+        if (reqId !== reqIdRef.current) {
+          stopPolling();
+          return;
+        }
+        try {
+          const statuses = await fetchScreenerStatus();
+          const mine = statuses[targetMarket];
+          if (reqId !== reqIdRef.current) return;
+          setProgressByMarket((prev) => ({ ...prev, [targetMarket]: mine }));
+          if (mine.status === "ready") {
+            stopPolling();
+            await loadRows(targetMarket, reqId);
+          } else if (mine.status === "failed") {
+            stopPolling();
+            setError(mine.error ?? "prewarm failed");
+          }
+        } catch (e) {
+          // 状态接口抖一下不算致命,继续轮询
+          console.warn("screener status poll failed", e);
+        }
+      };
+      pollRef.current = window.setInterval(tick, STATUS_POLL_MS);
+      // 立即触发一次,不用等 2s
+      void tick();
+    },
+    [loadRows, stopPolling],
+  );
 
-  const onRefresh = () => load(market, true);
+  const load = useCallback(
+    async (targetMarket: Market, refresh: boolean) => {
+      const myReqId = ++reqIdRef.current;
+      setError(null);
+      stopPolling();
+      try {
+        const resp = await fetchScreener(targetMarket, 20, refresh);
+        if (myReqId !== reqIdRef.current) return;
+        if (resp.kind === "ready") {
+          setRowsByMarket((prev) => ({ ...prev, [targetMarket]: resp.rows }));
+          setUpdatedByMarket((prev) => ({ ...prev, [targetMarket]: new Date() }));
+          setProgressByMarket((prev) => ({
+            ...prev,
+            [targetMarket]: {
+              status: "ready",
+              done: 0,
+              total: 0,
+              started_at: null,
+              error: null,
+            },
+          }));
+          return;
+        }
+        // warming:展示进度 + 轮询
+        setProgressByMarket((prev) => ({ ...prev, [targetMarket]: resp.progress }));
+        startPolling(targetMarket, myReqId);
+      } catch (e: unknown) {
+        if (myReqId !== reqIdRef.current) return;
+        setError(e instanceof Error ? e.message : String(e));
+      }
+    },
+    [startPolling, stopPolling],
+  );
+
+  useEffect(() => {
+    void load(market, false);
+    return stopPolling;
+  }, [market, load, stopPolling]);
+
+  // 组件卸载时也清定时器(上面的 cleanup 每次 market change 已经跑,这层保险)
+  useEffect(() => {
+    return stopPolling;
+  }, [stopPolling]);
+
+  const onRefresh = () => {
+    void load(market, true);
+  };
+
+  const warmingHint = (() => {
+    if (!progress) return null;
+    if (progress.status === "failed") {
+      return (
+        t("dashboard.warming_failed_prefix") + (progress.error ?? "unknown")
+      );
+    }
+    if (progress.total > 0) {
+      const pct = Math.floor((progress.done / progress.total) * 100);
+      return interpolate(t("dashboard.warming_hint"), {
+        done: progress.done,
+        total: progress.total,
+        pct,
+      });
+    }
+    return t("dashboard.warming_hint_indeterminate");
+  })();
 
   return (
     <TooltipProvider>
@@ -90,15 +203,8 @@ export default function DashboardPage() {
             </p>
           </div>
           <div className="flex flex-shrink-0 flex-col items-end gap-1">
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={onRefresh}
-              disabled={fetching}
-            >
-              {fetching && hasData
-                ? t("dashboard.refreshing")
-                : t("dashboard.refresh")}
+            <Button variant="outline" size="sm" onClick={onRefresh}>
+              {warming ? t("dashboard.refreshing") : t("dashboard.refresh")}
             </Button>
             <span className="text-xs text-muted-foreground">
               {t("dashboard.last_updated")}:{" "}
@@ -106,6 +212,31 @@ export default function DashboardPage() {
             </span>
           </div>
         </div>
+
+        {/* warming 时把进度条挂在表格上方,不管有没有已有数据都显示;refresh
+            期间如果上一份数据还在 rowsByMarket,继续显示成 60% 透明度 */}
+        {warming && progress && (
+          <div className="rounded-lg border border-border bg-muted/30 p-3">
+            <div className="flex items-center justify-between text-xs text-muted-foreground">
+              <span>{warmingHint}</span>
+              {progress.total > 0 && (
+                <span className="font-mono">
+                  {Math.floor((progress.done / progress.total) * 100)}%
+                </span>
+              )}
+            </div>
+            {progress.total > 0 && (
+              <div className="mt-2 h-1.5 w-full overflow-hidden rounded-full bg-border/50">
+                <div
+                  className="h-full bg-primary transition-all duration-500 ease-out"
+                  style={{
+                    width: `${Math.floor((progress.done / progress.total) * 100)}%`,
+                  }}
+                />
+              </div>
+            )}
+          </div>
+        )}
 
         {error ? (
           <div className="rounded-lg border border-destructive/50 bg-destructive/10 p-4 text-sm text-destructive">
@@ -140,7 +271,7 @@ export default function DashboardPage() {
                 </tr>
               </thead>
               <tbody>
-                {fetching && !hasData && (
+                {warming && !hasData && (
                   <tr>
                     <td
                       colSpan={8}
@@ -167,7 +298,7 @@ export default function DashboardPage() {
                         }
                       }}
                       className={`cursor-pointer border-b last:border-b-0 hover:bg-muted/50 ${
-                        fetching ? "opacity-60 transition-opacity" : ""
+                        warming ? "opacity-60 transition-opacity" : ""
                       }`}
                     >
                       <td className="px-4 py-3 font-mono font-medium">
@@ -209,7 +340,7 @@ export default function DashboardPage() {
                       </td>
                     </tr>
                   ))}
-                {!fetching && !hasData && (
+                {!warming && !hasData && (
                   <tr>
                     <td
                       colSpan={8}

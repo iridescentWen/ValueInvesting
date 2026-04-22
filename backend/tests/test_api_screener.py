@@ -175,7 +175,7 @@ async def test_compute_screener_raises_on_empty_passed(monkeypatch) -> None:
     实测:yfinance 批量 401 会让 HK coarse_passed=0,老实存空结果的话用户
     就被卡在空界面上一整个 TTL;抛异常让下次请求重新试。
     """
-    async def _empty_cn_candidates(_provider: Any) -> list[Any]:
+    async def _empty_cn_candidates(_provider: Any, tracker: Any = None) -> list[Any]:
         return []
 
     monkeypatch.setattr(screener_mod, "_cn_candidates", _empty_cn_candidates)
@@ -199,7 +199,7 @@ async def test_compute_screener_empty_does_not_poison_cache(monkeypatch) -> None
 
     call_count = {"n": 0}
 
-    async def _flaky_cn_candidates(_provider: Any) -> list[Any]:
+    async def _flaky_cn_candidates(_provider: Any, tracker: Any = None) -> list[Any]:
         call_count["n"] += 1
         if call_count["n"] == 1:
             return []  # 上游第一次"挂"
@@ -224,8 +224,8 @@ async def test_compute_screener_empty_does_not_poison_cache(monkeypatch) -> None
         lambda _market: CnProvider(mairui_client=None),
     )
     # 用全新 cache,避免被其他测试污染
-    from app.data.cache import AsyncTTLCache
     from app.api.screener import ScreenerResult
+    from app.data.cache import AsyncTTLCache
     fresh_cache: AsyncTTLCache[list[ScreenerResult]] = AsyncTTLCache(3600)
     monkeypatch.setattr(screener_mod, "_screener_cache", fresh_cache)
 

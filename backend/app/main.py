@@ -1,4 +1,3 @@
-import asyncio
 import logging
 from collections.abc import AsyncIterator
 from contextlib import asynccontextmanager
@@ -59,10 +58,10 @@ log = logging.getLogger(__name__)
 @asynccontextmanager
 async def lifespan(_: FastAPI) -> AsyncIterator[None]:
     log.info("Starting ValueInvesting API in env=%s", settings.env)
-    # 三市场 screener 冷启动 30-90s,放后台跑不阻塞 boot;跑完的结果会自动
-    # 落到 _screener_cache,第一个真实用户请求直接命中缓存
-    for market in ("cn", "us", "hk"):
-        asyncio.create_task(screener.prewarm(market))
+    # 三市场 screener 冷启动 30-90s(CN 受 Mairui 240 req/min 限速能到 22min)。
+    # boot_screener_cache() 先从磁盘读回未过期的 passed 列表,只对 miss 的市
+    # 场 spawn prewarm——开发期频繁重启时,hot 市场直接 ready。
+    await screener.boot_screener_cache()
     yield
     log.info("Shutting down ValueInvesting API")
     await close_all_providers()
