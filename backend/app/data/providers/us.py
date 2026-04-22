@@ -5,6 +5,7 @@ from typing import Any, ClassVar
 import httpx
 
 from app.config import settings
+from app.data.cache import AsyncTTLCache
 from app.data.clients.fmp import FmpClient
 from app.data.clients.seekingalpha import SeekingAlphaClient
 from app.data.providers.base import (
@@ -19,17 +20,22 @@ from app.data.providers.base import (
 from app.models.enums import Market
 
 _US_EXCHANGES = {"NYSE", "NASDAQ", "AMEX"}
+_FUND_TTL_SECONDS = 3600  # 1h: screener reload 期间 FMP quota 友好
 
 
 def _dec(v: Any) -> Decimal | None:
     if v is None or v == "":
         return None
-    if isinstance(v, float) and v != v:  # NaN
-        return None
+    if isinstance(v, float):
+        if v != v or v in (float("inf"), float("-inf")):
+            return None
     try:
-        return Decimal(str(v))
+        d = Decimal(str(v))
     except (ValueError, ArithmeticError):
         return None
+    if not d.is_finite():
+        return None
+    return d
 
 
 class UsProvider(MarketDataProvider):
@@ -60,6 +66,8 @@ class UsProvider(MarketDataProvider):
             )
         else:
             self._sa = None
+
+        self._fund_cache: AsyncTTLCache[Fundamentals] = AsyncTTLCache(_FUND_TTL_SECONDS)
 
     async def aclose(self) -> None:
         if self._fmp is not None:
@@ -126,6 +134,11 @@ class UsProvider(MarketDataProvider):
     async def get_fundamentals(self, symbol: str) -> Fundamentals | None:
         if self._fmp is None:
             return None
+
+        cached = self._fund_cache.get(symbol)
+        if cached is not None:
+            return cached
+
         try:
             ratios = await self._fmp.get_ratios_ttm(symbol)
             profile = await self._fmp.get_profile(symbol)
@@ -135,7 +148,7 @@ class UsProvider(MarketDataProvider):
             return None
         r = ratios[0] if ratios else {}
         p = profile[0] if profile else {}
-        return Fundamentals(
+        result = Fundamentals(
             symbol=symbol,
             as_of=date.today(),
             pe=_dec(r.get("peRatioTTM")),
@@ -145,6 +158,8 @@ class UsProvider(MarketDataProvider):
             dividend_yield=_dec(r.get("dividendYieldTTM") or r.get("dividendYielTTM")),
             market_cap=_dec(p.get("mktCap")),
         )
+        self._fund_cache.set(symbol, result)
+        return result
 
     async def get_realtime_quote(self, symbol: str) -> RealtimeQuote | None:
         if self._sa is None:

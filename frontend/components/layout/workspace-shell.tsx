@@ -11,10 +11,12 @@ import {
   ResizablePanel,
   ResizablePanelGroup,
 } from "@/components/ui/resizable";
+import { I18nProvider } from "@/lib/i18n";
 import { useAppStore } from "@/lib/store";
 
 export function WorkspaceShell({ children }: { children: React.ReactNode }) {
   const [commandOpen, setCommandOpen] = useState(false);
+  const locale = useAppStore((s) => s.locale);
   const chatOpen = useAppStore((s) => s.chatPanelOpen);
   const chatWidth = useAppStore((s) => s.chatPanelWidth);
   const setChatWidth = useAppStore((s) => s.setChatPanelWidth);
@@ -22,6 +24,7 @@ export function WorkspaceShell({ children }: { children: React.ReactNode }) {
   // 折叠时右栏用固定 40px 的独立 div（不进 ResizablePanelGroup），
   // 展开时把右栏挂进 PanelGroup 以便拖动。
   return (
+    <I18nProvider locale={locale}>
     <div className="flex h-dvh flex-col">
       <TopBar onOpenCommand={() => setCommandOpen(true)} />
 
@@ -62,6 +65,7 @@ export function WorkspaceShell({ children }: { children: React.ReactNode }) {
 
       <CommandPalette open={commandOpen} onOpenChange={setCommandOpen} />
     </div>
+    </I18nProvider>
   );
 }
 

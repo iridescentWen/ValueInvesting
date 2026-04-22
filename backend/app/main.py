@@ -1,3 +1,4 @@
+import asyncio
 import logging
 from collections.abc import AsyncIterator
 from contextlib import asynccontextmanager
@@ -8,7 +9,7 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
 from app.agents.registry import close_all as close_all_agents
-from app.api import chat, health, stocks
+from app.api import chat, health, screener, stocks
 from app.config import settings
 from app.data.providers import close_all as close_all_providers
 
@@ -46,6 +47,10 @@ def _configure_logging() -> None:
         lg.handlers = [file_handler, stream_handler]
         lg.propagate = False
 
+    # yfinance 对 HK 股票批量查询偶发 401 Invalid Crumb(上游 session cookie
+    # 过期),这类失败上层已经 try/except 了,logger 自己再 ERROR 一遍只是噪音
+    logging.getLogger("yfinance").setLevel(logging.CRITICAL)
+
 
 _configure_logging()
 log = logging.getLogger(__name__)
@@ -54,6 +59,10 @@ log = logging.getLogger(__name__)
 @asynccontextmanager
 async def lifespan(_: FastAPI) -> AsyncIterator[None]:
     log.info("Starting ValueInvesting API in env=%s", settings.env)
+    # 三市场 screener 冷启动 30-90s,放后台跑不阻塞 boot;跑完的结果会自动
+    # 落到 _screener_cache,第一个真实用户请求直接命中缓存
+    for market in ("cn", "us", "hk"):
+        asyncio.create_task(screener.prewarm(market))
     yield
     log.info("Shutting down ValueInvesting API")
     await close_all_providers()
@@ -77,4 +86,5 @@ app.add_middleware(
 
 app.include_router(health.router)
 app.include_router(stocks.router)
+app.include_router(screener.router)
 app.include_router(chat.router)

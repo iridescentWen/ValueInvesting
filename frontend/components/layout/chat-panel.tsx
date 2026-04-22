@@ -29,9 +29,11 @@ import {
 import { Button } from "@/components/ui/button";
 import type { ChatMessage, ChatToolCall } from "@/lib/chat";
 import { useChatStream } from "@/lib/chat";
+import { useT } from "@/lib/i18n";
 import { useAppStore } from "@/lib/store";
 
 export function ChatPanel() {
+  const t = useT();
   const open = useAppStore((s) => s.chatPanelOpen);
   const toggle = useAppStore((s) => s.toggleChatPanel);
 
@@ -42,12 +44,12 @@ export function ChatPanel() {
       <div className="flex h-12 items-center justify-between border-b px-3">
         <div className="flex items-center gap-2 text-sm font-medium">
           <SparklesIcon className="size-4 text-(color:--color-brand)" />
-          Chat
+          {t("chat.header")}
         </div>
         <Button
           variant="ghost"
           size="icon-sm"
-          aria-label="Close chat"
+          aria-label={t("chat.close_aria")}
           onClick={toggle}
         >
           <XIcon />
@@ -60,11 +62,12 @@ export function ChatPanel() {
 }
 
 function ChatPanelCollapsed({ onExpand }: { onExpand: () => void }) {
+  const t = useT();
   return (
     <button
       type="button"
       onClick={onExpand}
-      aria-label="Open chat"
+      aria-label={t("chat.open_aria")}
       className="flex h-full w-10 flex-col items-center justify-start gap-3 border-l bg-sidebar py-3 text-muted-foreground hover:text-foreground"
     >
       <MessageSquareIcon className="size-4" />
@@ -72,13 +75,14 @@ function ChatPanelCollapsed({ onExpand }: { onExpand: () => void }) {
         className="text-xs tracking-wider"
         style={{ writingMode: "vertical-rl" }}
       >
-        CHAT
+        {t("chat.collapsed_label")}
       </span>
     </button>
   );
 }
 
 function ChatBody() {
+  const t = useT();
   const { messages, isStreaming, error, send } = useChatStream();
 
   return (
@@ -88,8 +92,8 @@ function ChatBody() {
           {messages.length === 0 ? (
             <ConversationEmptyState
               icon={<SparklesIcon className="size-6" />}
-              title="问价值投资 AI"
-              description="试试「用安全边际评估一下 AAPL」"
+              title={t("chat.empty_title")}
+              description={t("chat.empty_desc")}
             />
           ) : (
             messages.map((m) => <ChatMessageView key={m.id} message={m} />)
@@ -111,12 +115,12 @@ function ChatBody() {
         }}
       >
         <PromptInputTextarea
-          placeholder="问点什么……Shift+Enter 换行"
+          placeholder={t("chat.placeholder")}
           disabled={isStreaming}
         />
         <PromptInputFooter>
           <span className="text-xs text-muted-foreground">
-            {isStreaming ? "思考中…" : ""}
+            {isStreaming ? t("chat.thinking") : ""}
           </span>
           <PromptInputSubmit
             disabled={isStreaming}

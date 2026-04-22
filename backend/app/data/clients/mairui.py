@@ -42,3 +42,35 @@ class MairuiClient:
     async def get_financial_metrics(self, symbol: str) -> list[dict[str, Any]]:
         """返回按报告期倒序的财务指标列表。"""
         return await self._get(self._METRICS, symbol)
+
+    async def get_realtime(self, symbol: str) -> dict[str, Any]:
+        """实时交易快照:`/hsrl/ssjy/{code}/{key}`。
+
+        返回原始 dict,关键字段:
+        - `p` 最新价, `pc` 涨跌额, `ud` 涨跌幅
+        - `pe` 市盈率, `sjl` 市净率, `sz` 总市值, `lt` 流通市值
+        - `v` 成交量, `cje` 成交额, `t` 时间戳
+
+        用于 screener 粗筛:PE / 市净率 / 总市值 直接从这里拿,跳过 AkShare
+        被 geo-block 的 `stock_zh_a_spot_em` 全市场端点。
+        """
+        resp = await self._client.get(f"/hsrl/ssjy/{symbol}/{self._api_key}")
+        resp.raise_for_status()
+        data = resp.json()
+        return data if isinstance(data, dict) else {}
+
+    async def list_all_stocks(self) -> list[dict[str, Any]]:
+        """`/hslt/list/{key}`:全 A 股基础名单(~5200 支,一次请求 0.3s)。
+
+        每条字段:
+        - `dm` 代码(含后缀,如 `000001.SZ`)
+        - `mc` 中文名
+        - `jys` 交易所(`SZ`/`SH`/`BJ`)
+
+        是 screener 的种子名单来源——比硬编码 CSI300 的 ~200 支覆盖面大 25 倍。
+        这个端点不走 East Money,境外能通(探测通过)。
+        """
+        resp = await self._client.get(f"/hslt/list/{self._api_key}")
+        resp.raise_for_status()
+        data = resp.json()
+        return data if isinstance(data, list) else []

@@ -26,6 +26,8 @@ dependencies = [
 [project.optional-dependencies]
 cn = ["akshare>=1.15"]
 us = ["yfinance>=0.2.50"]
+# HK 同时需要 akshare（Sina 全量名单）和 yfinance（per-stock 基本面）
+hk = ["yfinance>=0.2.50", "akshare>=1.15"]
 
 [dependency-groups]
 dev = [

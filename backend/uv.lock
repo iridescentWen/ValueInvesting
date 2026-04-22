@@ -3790,6 +3790,10 @@ dependencies = [
 cn = [
     { name = "akshare" },
 ]
+hk = [
+    { name = "akshare" },
+    { name = "yfinance" },
+]
 us = [
     { name = "yfinance" },
 ]
@@ -3805,6 +3809,7 @@ dev = [
 [package.metadata]
 requires-dist = [
     { name = "akshare", marker = "extra == 'cn'", specifier = ">=1.15" },
+    { name = "akshare", marker = "extra == 'hk'", specifier = ">=1.15" },
     { name = "alembic", specifier = ">=1.18.4" },
     { name = "arq", specifier = ">=0.26" },
     { name = "duckdb", specifier = ">=1.1" },
@@ -3819,9 +3824,10 @@ requires-dist = [
     { name = "sqlalchemy", extras = ["asyncio"], specifier = ">=2.0" },
     { name = "sse-starlette", specifier = ">=2.1" },
     { name = "uvicorn", extras = ["standard"], specifier = ">=0.32" },
+    { name = "yfinance", marker = "extra == 'hk'", specifier = ">=0.2.50" },
     { name = "yfinance", marker = "extra == 'us'", specifier = ">=0.2.50" },
 ]
-provides-extras = ["cn", "us"]
+provides-extras = ["cn", "us", "hk"]
 
 [package.metadata.requires-dev]
 dev = [

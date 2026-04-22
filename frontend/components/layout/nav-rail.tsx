@@ -5,6 +5,7 @@ import {
   GaugeIcon,
   GitCompareIcon,
   LineChartIcon,
+  SettingsIcon,
   StarIcon,
 } from "lucide-react";
 import Link from "next/link";
@@ -16,11 +17,12 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
+import { type TKey, useT } from "@/lib/i18n";
 import { cn } from "@/lib/utils";
 
 type NavItem = {
   href: string;
-  label: string;
+  labelKey: TKey;
   icon: typeof GaugeIcon;
   match: (pathname: string) => boolean;
 };
@@ -28,38 +30,45 @@ type NavItem = {
 const NAV_ITEMS: NavItem[] = [
   {
     href: "/dashboard",
-    label: "Dashboard",
+    labelKey: "nav.dashboard",
     icon: GaugeIcon,
     match: (p) => p === "/dashboard" || p === "/",
   },
   {
     href: "/screener",
-    label: "筛选",
+    labelKey: "nav.screener",
     icon: BarChart3Icon,
     match: (p) => p.startsWith("/screener"),
   },
   {
     href: "/compare",
-    label: "对比",
+    labelKey: "nav.compare",
     icon: GitCompareIcon,
     match: (p) => p.startsWith("/compare"),
   },
   {
     href: "/watchlist",
-    label: "自选",
+    labelKey: "nav.watchlist",
     icon: StarIcon,
     match: (p) => p.startsWith("/watchlist"),
   },
   {
     href: "/stock/AAPL",
-    label: "个股 (demo)",
+    labelKey: "nav.stock_demo",
     icon: LineChartIcon,
     match: (p) => p.startsWith("/stock"),
+  },
+  {
+    href: "/settings",
+    labelKey: "nav.settings",
+    icon: SettingsIcon,
+    match: (p) => p.startsWith("/settings"),
   },
 ];
 
 export function NavRail() {
   const pathname = usePathname();
+  const t = useT();
 
   return (
     <TooltipProvider delayDuration={200}>
@@ -67,12 +76,13 @@ export function NavRail() {
         {NAV_ITEMS.map((item) => {
           const active = item.match(pathname);
           const Icon = item.icon;
+          const label = t(item.labelKey);
           return (
             <Tooltip key={item.href}>
               <TooltipTrigger asChild>
                 <Link
                   href={item.href}
-                  aria-label={item.label}
+                  aria-label={label}
                   aria-current={active ? "page" : undefined}
                   className={cn(
                     "flex size-10 items-center justify-center rounded-md text-muted-foreground transition-colors",
@@ -84,7 +94,7 @@ export function NavRail() {
                   <Icon className="size-4" />
                 </Link>
               </TooltipTrigger>
-              <TooltipContent side="right">{item.label}</TooltipContent>
+              <TooltipContent side="right">{label}</TooltipContent>
             </Tooltip>
           );
         })}

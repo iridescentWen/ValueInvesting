@@ -1,5 +1,6 @@
 from app.data.providers.base import MarketDataProvider
 from app.data.providers.cn import CnProvider
+from app.data.providers.hk import HkProvider
 from app.data.providers.us import UsProvider
 from app.models.enums import Market
 
@@ -13,6 +14,8 @@ def get_provider(market: Market) -> MarketDataProvider:
             _REGISTRY[market] = CnProvider()
         elif market == "us":
             _REGISTRY[market] = UsProvider()
+        elif market == "hk":
+            _REGISTRY[market] = HkProvider()
         else:
             raise ValueError(f"Unsupported market: {market}")
     return _REGISTRY[market]

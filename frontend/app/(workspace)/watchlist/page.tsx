@@ -1,10 +1,14 @@
+"use client";
+
 import { WorkspacePlaceholder } from "@/components/layout/workspace-placeholder";
+import { useT } from "@/lib/i18n";
 
 export default function WatchlistPage() {
+  const t = useT();
   return (
     <WorkspacePlaceholder
-      title="自选"
-      description="用户自选股列表 · 价格提醒 · AI 每日简报。Phase 2 起逐步实现。"
+      title={t("pages.watchlist.title")}
+      description={t("pages.watchlist.description")}
     />
   );
 }

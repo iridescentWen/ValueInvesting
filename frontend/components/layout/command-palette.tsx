@@ -21,6 +21,7 @@ import {
   CommandList,
   CommandSeparator,
 } from "@/components/ui/command";
+import { useT } from "@/lib/i18n";
 import { MARKETS, useAppStore } from "@/lib/store";
 
 export function CommandPalette({
@@ -30,6 +31,7 @@ export function CommandPalette({
   open: boolean;
   onOpenChange: (open: boolean) => void;
 }) {
+  const t = useT();
   const router = useRouter();
   const { theme, setTheme } = useTheme();
   const setMarket = useAppStore((s) => s.setMarket);
@@ -51,50 +53,58 @@ export function CommandPalette({
   };
 
   return (
-    <CommandDialog open={open} onOpenChange={onOpenChange} title="命令">
-      <CommandInput placeholder="输入命令或搜索……" />
+    <CommandDialog
+      open={open}
+      onOpenChange={onOpenChange}
+      title={t("command.dialog_title")}
+    >
+      <CommandInput placeholder={t("command.placeholder")} />
       <CommandList>
-        <CommandEmpty>没有匹配项。</CommandEmpty>
+        <CommandEmpty>{t("command.empty")}</CommandEmpty>
 
-        <CommandGroup heading="导航">
+        <CommandGroup heading={t("command.group_nav")}>
           <CommandItem onSelect={() => run(() => router.push("/dashboard"))}>
             <GaugeIcon />
-            <span>打开 Dashboard</span>
+            <span>{t("command.open_dashboard")}</span>
           </CommandItem>
           <CommandItem onSelect={() => run(() => router.push("/screener"))}>
             <BarChart3Icon />
-            <span>打开筛选器</span>
+            <span>{t("command.open_screener")}</span>
           </CommandItem>
           <CommandItem onSelect={() => run(() => router.push("/watchlist"))}>
             <StarIcon />
-            <span>打开自选</span>
+            <span>{t("command.open_watchlist")}</span>
           </CommandItem>
         </CommandGroup>
 
         <CommandSeparator />
 
-        <CommandGroup heading="切换市场">
+        <CommandGroup heading={t("command.group_market")}>
           {MARKETS.map((m) => (
-            <CommandItem
-              key={m.value}
-              onSelect={() => run(() => setMarket(m.value))}
-            >
+            <CommandItem key={m} onSelect={() => run(() => setMarket(m))}>
               <GlobeIcon />
-              <span>切到 {m.label}</span>
+              <span>
+                {t("command.switch_market_prefix")}
+                {t(`market.${m}` as const)}
+              </span>
             </CommandItem>
           ))}
         </CommandGroup>
 
         <CommandSeparator />
 
-        <CommandGroup heading="外观">
+        <CommandGroup heading={t("command.group_appearance")}>
           <CommandItem
             onSelect={() =>
               run(() => setTheme(theme === "dark" ? "light" : "dark"))
             }
           >
             {theme === "dark" ? <SunIcon /> : <MoonIcon />}
-            <span>切换到 {theme === "dark" ? "浅色" : "深色"} 主题</span>
+            <span>
+              {theme === "dark"
+                ? t("command.theme_to_light")
+                : t("command.theme_to_dark")}
+            </span>
           </CommandItem>
         </CommandGroup>
       </CommandList>

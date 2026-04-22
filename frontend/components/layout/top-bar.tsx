@@ -1,6 +1,6 @@
 "use client";
 
-import { MoonIcon, SearchIcon, SettingsIcon, SunIcon } from "lucide-react";
+import { MoonIcon, SearchIcon, SunIcon } from "lucide-react";
 import { useTheme } from "next-themes";
 import { useEffect, useState } from "react";
 
@@ -11,6 +11,7 @@ import {
   TabsList,
   TabsTrigger,
 } from "@/components/ui/tabs";
+import { useT } from "@/lib/i18n";
 import { MARKETS, useAppStore } from "@/lib/store";
 
 type TopBarProps = {
@@ -18,6 +19,7 @@ type TopBarProps = {
 };
 
 export function TopBar({ onOpenCommand }: TopBarProps) {
+  const t = useT();
   const market = useAppStore((s) => s.market);
   const setMarket = useAppStore((s) => s.setMarket);
 
@@ -26,7 +28,7 @@ export function TopBar({ onOpenCommand }: TopBarProps) {
       <div className="flex items-center gap-2">
         <div className="size-6 rounded-md bg-(color:--color-brand)" />
         <span className="text-sm font-semibold tracking-tight">
-          ValueInvesting
+          {t("brand")}
         </span>
       </div>
 
@@ -38,8 +40,8 @@ export function TopBar({ onOpenCommand }: TopBarProps) {
       >
         <TabsList className="h-8">
           {MARKETS.map((m) => (
-            <TabsTrigger key={m.value} value={m.value} className="text-xs">
-              {m.label}
+            <TabsTrigger key={m} value={m} className="text-xs">
+              {t(`market.${m}` as const)}
             </TabsTrigger>
           ))}
         </TabsList>
@@ -54,29 +56,31 @@ export function TopBar({ onOpenCommand }: TopBarProps) {
         onClick={onOpenCommand}
       >
         <SearchIcon className="size-3.5" />
-        <span>搜索 / 命令</span>
+        <span>{t("top_bar.search_button")}</span>
         <kbd className="ml-2 rounded border bg-muted px-1.5 py-0.5 font-mono text-[10px] text-muted-foreground">
           ⌘K
         </kbd>
       </Button>
 
       <ThemeToggle />
-
-      <Button variant="ghost" size="icon-sm" aria-label="Settings">
-        <SettingsIcon />
-      </Button>
     </header>
   );
 }
 
 function ThemeToggle() {
+  const t = useT();
   const { theme, setTheme } = useTheme();
   const [mounted, setMounted] = useState(false);
   useEffect(() => setMounted(true), []);
 
   if (!mounted) {
     return (
-      <Button variant="ghost" size="icon-sm" aria-label="Toggle theme" disabled>
+      <Button
+        variant="ghost"
+        size="icon-sm"
+        aria-label={t("top_bar.theme_aria")}
+        disabled
+      >
         <MoonIcon />
       </Button>
     );
@@ -87,7 +91,7 @@ function ThemeToggle() {
     <Button
       variant="ghost"
       size="icon-sm"
-      aria-label="Toggle theme"
+      aria-label={t("top_bar.theme_aria")}
       onClick={() => setTheme(isDark ? "light" : "dark")}
     >
       {isDark ? <SunIcon /> : <MoonIcon />}

@@ -55,3 +55,47 @@ async def test_http_error_raises() -> None:
             await client.get_financial_metrics("600519")
     finally:
         await client.aclose()
+
+
+@pytest.mark.asyncio
+async def test_get_realtime_hits_ssjy_path_and_returns_dict() -> None:
+    seen: dict[str, str] = {}
+
+    def handler(request: httpx.Request) -> httpx.Response:
+        seen["path"] = request.url.path
+        return httpx.Response(
+            200,
+            json={
+                "t": "2026-04-21 15:00:00",
+                "p": 1411.63,
+                "pe": 21.47,
+                "sjl": 7.23,
+                "sz": 1767742203600.0,
+                "lt": 1767742203600.0,
+            },
+        )
+
+    client = _make_client(handler)
+    try:
+        data = await client.get_realtime("600519")
+    finally:
+        await client.aclose()
+
+    assert seen["path"] == "/hsrl/ssjy/600519/LICENSE"
+    assert data["pe"] == 21.47
+    assert data["sjl"] == 7.23
+    assert data["sz"] == 1767742203600.0
+
+
+@pytest.mark.asyncio
+async def test_get_realtime_non_dict_coerced_to_empty() -> None:
+    def handler(request: httpx.Request) -> httpx.Response:
+        return httpx.Response(200, json=[])  # 错误时 Mairui 偶尔给数组
+
+    client = _make_client(handler)
+    try:
+        data = await client.get_realtime("000000")
+    finally:
+        await client.aclose()
+
+    assert data == {}

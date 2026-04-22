@@ -32,6 +32,33 @@ class FmpClient:
     async def list_us_stocks(self) -> list[dict[str, Any]]:
         return await self._get("/v3/stock/list")
 
+    async def get_screener(
+        self,
+        *,
+        pe_lower_than: float | None = None,
+        pb_lower_than: float | None = None,
+        market_cap_more_than: float | None = None,
+        limit: int = 200,
+    ) -> list[dict[str, Any]]:
+        """FMP `/v3/stock-screener`：按 PE / PB / 市值门槛服务器端筛一次。
+
+        响应只含 symbol / companyName / marketCap / sector / beta 等基础字段，
+        不含 PE/PB/ROE——这些要再调 ratios-ttm 拿。但作为候选池比
+        list_us_stocks 的全量（2 万+）要精确得多。
+        """
+        params: dict[str, Any] = {
+            "isEtf": "false",
+            "isActivelyTrading": "true",
+            "limit": limit,
+        }
+        if pe_lower_than is not None:
+            params["peLowerThan"] = pe_lower_than
+        if pb_lower_than is not None:
+            params["priceToBookRatioLowerThan"] = pb_lower_than
+        if market_cap_more_than is not None:
+            params["marketCapMoreThan"] = market_cap_more_than
+        return await self._get("/v3/stock-screener", **params)
+
     async def get_historical_prices(self, symbol: str, start: str, end: str) -> dict[str, Any]:
         """返回 `{"symbol": "AAPL", "historical": [{"date": ..., ...}]}`。"""
         # `from` 是 Python 关键字，只能用 **kwargs 方式

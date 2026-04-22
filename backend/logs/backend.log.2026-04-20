@@ -1,0 +1,112 @@
+2026-04-20 21:02:04 INFO    uvicorn.error: Started server process [54792]
+2026-04-20 21:02:04 INFO    uvicorn.error: Waiting for application startup.
+2026-04-20 21:02:04 INFO    app.main: Starting ValueInvesting API in env=development
+2026-04-20 21:02:04 INFO    uvicorn.error: Application startup complete.
+2026-04-20 21:02:14 INFO    uvicorn.error: Shutting down
+2026-04-20 21:02:14 INFO    uvicorn.error: Waiting for application shutdown.
+2026-04-20 21:02:14 INFO    app.main: Shutting down ValueInvesting API
+2026-04-20 21:02:14 INFO    uvicorn.error: Application shutdown complete.
+2026-04-20 21:02:14 INFO    uvicorn.error: Finished server process [54792]
+2026-04-20 21:02:16 INFO    uvicorn.error: Started server process [54891]
+2026-04-20 21:02:16 INFO    uvicorn.error: Waiting for application startup.
+2026-04-20 21:02:16 INFO    app.main: Starting ValueInvesting API in env=development
+2026-04-20 21:02:16 INFO    uvicorn.error: Application startup complete.
+2026-04-20 21:02:38 INFO    app.api.chat: POST /api/chat messages=1 locale=zh
+2026-04-20 21:02:38 INFO    uvicorn.access: 127.0.0.1:60963 - "POST /api/chat HTTP/1.1" 200
+2026-04-20 21:02:38 INFO    app.api.chat: chat stream start locale=zh prompt_len=4 history_turns=0 prompt_preview='苹果股价'
+2026-04-20 21:02:41 INFO    httpx: HTTP Request: POST https://dev-us2-ai.services.ai.azure.com/anthropic/v1/messages?beta=true "HTTP/1.1 200 OK"
+2026-04-20 21:02:50 INFO    app.api.chat: chat stream done events_total=27 events_emitted=24
+2026-04-20 21:04:07 INFO    uvicorn.error: Shutting down
+2026-04-20 21:04:07 INFO    uvicorn.error: Waiting for application shutdown.
+2026-04-20 21:04:07 INFO    app.main: Shutting down ValueInvesting API
+2026-04-20 21:04:07 INFO    uvicorn.error: Application shutdown complete.
+2026-04-20 21:04:07 INFO    uvicorn.error: Finished server process [54891]
+2026-04-20 21:04:09 INFO    uvicorn.error: Started server process [55796]
+2026-04-20 21:04:09 INFO    uvicorn.error: Waiting for application startup.
+2026-04-20 21:04:09 INFO    app.main: Starting ValueInvesting API in env=development
+2026-04-20 21:04:09 INFO    uvicorn.error: Application startup complete.
+2026-04-20 21:04:19 INFO    uvicorn.access: 127.0.0.1:61241 - "OPTIONS /api/chat HTTP/1.1" 200
+2026-04-20 21:04:19 INFO    app.api.chat: POST /api/chat messages=1 locale=zh
+2026-04-20 21:04:19 INFO    uvicorn.access: 127.0.0.1:61241 - "POST /api/chat HTTP/1.1" 200
+2026-04-20 21:04:19 INFO    app.api.chat: chat stream start locale=zh prompt_len=7 history_turns=0 prompt_preview='苹果股价怎么杨'
+2026-04-20 21:04:22 INFO    httpx: HTTP Request: POST https://dev-us2-ai.services.ai.azure.com/anthropic/v1/messages?beta=true "HTTP/1.1 200 OK"
+2026-04-20 21:04:34 INFO    app.api.chat: chat stream done events_total=33 events_emitted=30
+2026-04-20 21:04:59 INFO    httpx: HTTP Request: GET https://financialmodelingprep.com/api/v3/ratios-ttm/XOM?apikey=bsC6W80gIB7rJ1Hx3dAKqcks3HEMQYLW "HTTP/1.1 200 OK"
+2026-04-20 21:04:59 INFO    httpx: HTTP Request: GET https://financialmodelingprep.com/api/v3/ratios-ttm/T?apikey=bsC6W80gIB7rJ1Hx3dAKqcks3HEMQYLW "HTTP/1.1 200 OK"
+2026-04-20 21:04:59 INFO    httpx: HTTP Request: GET https://financialmodelingprep.com/api/v3/ratios-ttm/AVNS?apikey=bsC6W80gIB7rJ1Hx3dAKqcks3HEMQYLW "HTTP/1.1 200 OK"
+2026-04-20 21:04:59 INFO    httpx: HTTP Request: GET https://financialmodelingprep.com/api/v3/ratios-ttm/SGOV?apikey=bsC6W80gIB7rJ1Hx3dAKqcks3HEMQYLW "HTTP/1.1 200 OK"
+2026-04-20 21:04:59 INFO    httpx: HTTP Request: GET https://financialmodelingprep.com/api/v3/ratios-ttm/MRK?apikey=bsC6W80gIB7rJ1Hx3dAKqcks3HEMQYLW "HTTP/1.1 200 OK"
+2026-04-20 21:04:59 INFO    httpx: HTTP Request: GET https://financialmodelingprep.com/api/v3/ratios-ttm/AS?apikey=bsC6W80gIB7rJ1Hx3dAKqcks3HEMQYLW "HTTP/1.1 200 OK"
+2026-04-20 21:04:59 INFO    httpx: HTTP Request: GET https://financialmodelingprep.com/api/v3/ratios-ttm/ZETA?apikey=bsC6W80gIB7rJ1Hx3dAKqcks3HEMQYLW "HTTP/1.1 200 OK"
+2026-04-20 21:04:59 INFO    httpx: HTTP Request: GET https://financialmodelingprep.com/api/v3/ratios-ttm/P?apikey=bsC6W80gIB7rJ1Hx3dAKqcks3HEMQYLW "HTTP/1.1 200 OK"
+2026-04-20 21:04:59 INFO    httpx: HTTP Request: GET https://financialmodelingprep.com/api/v3/ratios-ttm/SHV?apikey=bsC6W80gIB7rJ1Hx3dAKqcks3HEMQYLW "HTTP/1.1 200 OK"
+2026-04-20 21:04:59 INFO    httpx: HTTP Request: GET https://financialmodelingprep.com/api/v3/ratios-ttm/PG?apikey=bsC6W80gIB7rJ1Hx3dAKqcks3HEMQYLW "HTTP/1.1 200 OK"
+2026-04-20 21:04:59 INFO    httpx: HTTP Request: GET https://financialmodelingprep.com/api/v3/profile/XOM?apikey=bsC6W80gIB7rJ1Hx3dAKqcks3HEMQYLW "HTTP/1.1 200 OK"
+2026-04-20 21:04:59 INFO    httpx: HTTP Request: GET https://financialmodelingprep.com/api/v3/profile/PG?apikey=bsC6W80gIB7rJ1Hx3dAKqcks3HEMQYLW "HTTP/1.1 200 OK"
+2026-04-20 21:04:59 INFO    uvicorn.access: 127.0.0.1:61502 - "GET /api/stocks/XOM/fundamentals?market=us HTTP/1.1" 200
+2026-04-20 21:04:59 INFO    uvicorn.access: 127.0.0.1:61497 - "GET /api/stocks/PG/fundamentals?market=us HTTP/1.1" 200
+2026-04-20 21:04:59 INFO    httpx: HTTP Request: GET https://financialmodelingprep.com/api/v3/profile/AVNS?apikey=bsC6W80gIB7rJ1Hx3dAKqcks3HEMQYLW "HTTP/1.1 200 OK"
+2026-04-20 21:04:59 INFO    httpx: HTTP Request: GET https://financialmodelingprep.com/api/v3/profile/P?apikey=bsC6W80gIB7rJ1Hx3dAKqcks3HEMQYLW "HTTP/1.1 200 OK"
+2026-04-20 21:04:59 INFO    httpx: HTTP Request: GET https://financialmodelingprep.com/api/v3/profile/ZETA?apikey=bsC6W80gIB7rJ1Hx3dAKqcks3HEMQYLW "HTTP/1.1 200 OK"
+2026-04-20 21:04:59 INFO    httpx: HTTP Request: GET https://financialmodelingprep.com/api/v3/profile/AS?apikey=bsC6W80gIB7rJ1Hx3dAKqcks3HEMQYLW "HTTP/1.1 200 OK"
+2026-04-20 21:04:59 INFO    httpx: HTTP Request: GET https://financialmodelingprep.com/api/v3/profile/T?apikey=bsC6W80gIB7rJ1Hx3dAKqcks3HEMQYLW "HTTP/1.1 200 OK"
+2026-04-20 21:04:59 INFO    httpx: HTTP Request: GET https://financialmodelingprep.com/api/v3/profile/SHV?apikey=bsC6W80gIB7rJ1Hx3dAKqcks3HEMQYLW "HTTP/1.1 200 OK"
+2026-04-20 21:04:59 INFO    httpx: HTTP Request: GET https://financialmodelingprep.com/api/v3/profile/MRK?apikey=bsC6W80gIB7rJ1Hx3dAKqcks3HEMQYLW "HTTP/1.1 200 OK"
+2026-04-20 21:04:59 INFO    uvicorn.access: 127.0.0.1:61500 - "GET /api/stocks/AVNS/fundamentals?market=us HTTP/1.1" 200
+2026-04-20 21:04:59 INFO    uvicorn.access: 127.0.0.1:61495 - "GET /api/stocks/P/fundamentals?market=us HTTP/1.1" 200
+2026-04-20 21:04:59 INFO    uvicorn.access: 127.0.0.1:61496 - "GET /api/stocks/ZETA/fundamentals?market=us HTTP/1.1" 200
+2026-04-20 21:04:59 INFO    uvicorn.access: 127.0.0.1:61498 - "GET /api/stocks/AS/fundamentals?market=us HTTP/1.1" 200
+2026-04-20 21:04:59 INFO    uvicorn.access: 127.0.0.1:61499 - "GET /api/stocks/T/fundamentals?market=us HTTP/1.1" 200
+2026-04-20 21:04:59 INFO    uvicorn.access: 127.0.0.1:61503 - "GET /api/stocks/SHV/fundamentals?market=us HTTP/1.1" 200
+2026-04-20 21:04:59 INFO    uvicorn.access: 127.0.0.1:61494 - "GET /api/stocks/MRK/fundamentals?market=us HTTP/1.1" 200
+2026-04-20 21:04:59 INFO    httpx: HTTP Request: GET https://financialmodelingprep.com/api/v3/profile/SGOV?apikey=bsC6W80gIB7rJ1Hx3dAKqcks3HEMQYLW "HTTP/1.1 200 OK"
+2026-04-20 21:04:59 INFO    uvicorn.access: 127.0.0.1:61501 - "GET /api/stocks/SGOV/fundamentals?market=us HTTP/1.1" 200
+2026-04-20 21:05:05 INFO    app.api.chat: POST /api/chat messages=1 locale=zh
+2026-04-20 21:05:05 INFO    uvicorn.access: 127.0.0.1:61243 - "POST /api/chat HTTP/1.1" 200
+2026-04-20 21:05:05 INFO    app.api.chat: chat stream start locale=zh prompt_len=7 history_turns=0 prompt_preview='苹果股价怎么杨'
+2026-04-20 21:05:13 INFO    httpx: HTTP Request: POST https://dev-us2-ai.services.ai.azure.com/anthropic/v1/messages?beta=true "HTTP/1.1 200 OK"
+2026-04-20 21:05:15 INFO    app.api.chat: chat tool-call name=load_skill args={'name': 'margin-of-safety'}
+2026-04-20 21:05:15 INFO    app.api.chat: chat tool-result id=toolu_01NWwVi2KsjcoEZZW6WxuMr9 len=582
+2026-04-20 21:05:16 INFO    httpx: HTTP Request: POST https://dev-us2-ai.services.ai.azure.com/anthropic/v1/messages?beta=true "HTTP/1.1 200 OK"
+2026-04-20 21:05:35 INFO    app.api.chat: chat stream done events_total=69 events_emitted=56
+2026-04-20 21:08:48 INFO    app.api.chat: POST /api/chat messages=1 locale=zh
+2026-04-20 21:08:48 INFO    uvicorn.access: 127.0.0.1:62993 - "POST /api/chat HTTP/1.1" 200
+2026-04-20 21:08:48 INFO    app.api.chat: chat stream start locale=zh prompt_len=2 history_turns=0 prompt_preview='hi'
+2026-04-20 21:08:51 INFO    httpx: HTTP Request: POST https://dev-us2-ai.services.ai.azure.com/anthropic/v1/messages?beta=true "HTTP/1.1 200 OK"
+2026-04-20 21:10:36 INFO    httpx: HTTP Request: GET https://financialmodelingprep.com/api/v3/ratios-ttm/ZETA?apikey=bsC6W80gIB7rJ1Hx3dAKqcks3HEMQYLW "HTTP/1.1 200 OK"
+2026-04-20 21:10:36 INFO    httpx: HTTP Request: GET https://financialmodelingprep.com/api/v3/ratios-ttm/SGOV?apikey=bsC6W80gIB7rJ1Hx3dAKqcks3HEMQYLW "HTTP/1.1 200 OK"
+2026-04-20 21:10:36 INFO    httpx: HTTP Request: GET https://financialmodelingprep.com/api/v3/ratios-ttm/PG?apikey=bsC6W80gIB7rJ1Hx3dAKqcks3HEMQYLW "HTTP/1.1 200 OK"
+2026-04-20 21:10:36 INFO    httpx: HTTP Request: GET https://financialmodelingprep.com/api/v3/ratios-ttm/T?apikey=bsC6W80gIB7rJ1Hx3dAKqcks3HEMQYLW "HTTP/1.1 200 OK"
+2026-04-20 21:10:36 INFO    httpx: HTTP Request: GET https://financialmodelingprep.com/api/v3/ratios-ttm/MRK?apikey=bsC6W80gIB7rJ1Hx3dAKqcks3HEMQYLW "HTTP/1.1 200 OK"
+2026-04-20 21:10:36 INFO    httpx: HTTP Request: GET https://financialmodelingprep.com/api/v3/ratios-ttm/AVNS?apikey=bsC6W80gIB7rJ1Hx3dAKqcks3HEMQYLW "HTTP/1.1 200 OK"
+2026-04-20 21:10:36 INFO    httpx: HTTP Request: GET https://financialmodelingprep.com/api/v3/ratios-ttm/XOM?apikey=bsC6W80gIB7rJ1Hx3dAKqcks3HEMQYLW "HTTP/1.1 200 OK"
+2026-04-20 21:10:36 INFO    httpx: HTTP Request: GET https://financialmodelingprep.com/api/v3/ratios-ttm/P?apikey=bsC6W80gIB7rJ1Hx3dAKqcks3HEMQYLW "HTTP/1.1 200 OK"
+2026-04-20 21:10:36 INFO    httpx: HTTP Request: GET https://financialmodelingprep.com/api/v3/ratios-ttm/SHV?apikey=bsC6W80gIB7rJ1Hx3dAKqcks3HEMQYLW "HTTP/1.1 200 OK"
+2026-04-20 21:10:37 INFO    httpx: HTTP Request: GET https://financialmodelingprep.com/api/v3/profile/T?apikey=bsC6W80gIB7rJ1Hx3dAKqcks3HEMQYLW "HTTP/1.1 200 OK"
+2026-04-20 21:10:37 INFO    uvicorn.access: 127.0.0.1:63665 - "GET /api/stocks/T/fundamentals?market=us HTTP/1.1" 200
+2026-04-20 21:10:37 INFO    httpx: HTTP Request: GET https://financialmodelingprep.com/api/v3/profile/PG?apikey=bsC6W80gIB7rJ1Hx3dAKqcks3HEMQYLW "HTTP/1.1 200 OK"
+2026-04-20 21:10:37 INFO    uvicorn.access: 127.0.0.1:63663 - "GET /api/stocks/PG/fundamentals?market=us HTTP/1.1" 200
+2026-04-20 21:10:37 INFO    httpx: HTTP Request: GET https://financialmodelingprep.com/api/v3/profile/MRK?apikey=bsC6W80gIB7rJ1Hx3dAKqcks3HEMQYLW "HTTP/1.1 200 OK"
+2026-04-20 21:10:37 INFO    uvicorn.access: 127.0.0.1:63660 - "GET /api/stocks/MRK/fundamentals?market=us HTTP/1.1" 200
+2026-04-20 21:10:37 INFO    httpx: HTTP Request: GET https://financialmodelingprep.com/api/v3/profile/ZETA?apikey=bsC6W80gIB7rJ1Hx3dAKqcks3HEMQYLW "HTTP/1.1 200 OK"
+2026-04-20 21:10:37 INFO    uvicorn.access: 127.0.0.1:63662 - "GET /api/stocks/ZETA/fundamentals?market=us HTTP/1.1" 200
+2026-04-20 21:10:37 INFO    httpx: HTTP Request: GET https://financialmodelingprep.com/api/v3/profile/SGOV?apikey=bsC6W80gIB7rJ1Hx3dAKqcks3HEMQYLW "HTTP/1.1 200 OK"
+2026-04-20 21:10:37 INFO    uvicorn.access: 127.0.0.1:63667 - "GET /api/stocks/SGOV/fundamentals?market=us HTTP/1.1" 200
+2026-04-20 21:10:37 INFO    httpx: HTTP Request: GET https://financialmodelingprep.com/api/v3/ratios-ttm/AS?apikey=bsC6W80gIB7rJ1Hx3dAKqcks3HEMQYLW "HTTP/1.1 200 OK"
+2026-04-20 21:10:37 INFO    httpx: HTTP Request: GET https://financialmodelingprep.com/api/v3/profile/AVNS?apikey=bsC6W80gIB7rJ1Hx3dAKqcks3HEMQYLW "HTTP/1.1 200 OK"
+2026-04-20 21:10:37 INFO    uvicorn.access: 127.0.0.1:63666 - "GET /api/stocks/AVNS/fundamentals?market=us HTTP/1.1" 200
+2026-04-20 21:10:37 INFO    httpx: HTTP Request: GET https://financialmodelingprep.com/api/v3/profile/P?apikey=bsC6W80gIB7rJ1Hx3dAKqcks3HEMQYLW "HTTP/1.1 200 OK"
+2026-04-20 21:10:37 INFO    uvicorn.access: 127.0.0.1:63661 - "GET /api/stocks/P/fundamentals?market=us HTTP/1.1" 200
+2026-04-20 21:10:37 INFO    httpx: HTTP Request: GET https://financialmodelingprep.com/api/v3/profile/SHV?apikey=bsC6W80gIB7rJ1Hx3dAKqcks3HEMQYLW "HTTP/1.1 200 OK"
+2026-04-20 21:10:37 INFO    uvicorn.access: 127.0.0.1:63669 - "GET /api/stocks/SHV/fundamentals?market=us HTTP/1.1" 200
+2026-04-20 21:10:37 INFO    httpx: HTTP Request: GET https://financialmodelingprep.com/api/v3/profile/XOM?apikey=bsC6W80gIB7rJ1Hx3dAKqcks3HEMQYLW "HTTP/1.1 200 OK"
+2026-04-20 21:10:37 INFO    uvicorn.access: 127.0.0.1:63668 - "GET /api/stocks/XOM/fundamentals?market=us HTTP/1.1" 200
+2026-04-20 21:10:37 INFO    httpx: HTTP Request: GET https://financialmodelingprep.com/api/v3/profile/AS?apikey=bsC6W80gIB7rJ1Hx3dAKqcks3HEMQYLW "HTTP/1.1 200 OK"
+2026-04-20 21:10:37 INFO    uvicorn.access: 127.0.0.1:63664 - "GET /api/stocks/AS/fundamentals?market=us HTTP/1.1" 200
+2026-04-20 21:10:39 INFO    httpx: HTTP Request: GET https://financialmodelingprep.com/api/v3/stock/list?apikey=bsC6W80gIB7rJ1Hx3dAKqcks3HEMQYLW "HTTP/1.1 200 OK"
+2026-04-20 21:10:41 INFO    uvicorn.access: 127.0.0.1:63659 - "GET /api/stocks?market=us&limit=10&offset=0 HTTP/1.1" 200
+2026-04-20 21:10:43 INFO    app.api.chat: POST /api/chat messages=1 locale=zh
+2026-04-20 21:10:43 INFO    uvicorn.access: 127.0.0.1:63748 - "POST /api/chat HTTP/1.1" 200
+2026-04-20 21:10:43 INFO    app.api.chat: chat stream start locale=zh prompt_len=6 history_turns=0 prompt_preview='看看苹果股价'
+2026-04-20 21:10:46 INFO    httpx: HTTP Request: POST https://dev-us2-ai.services.ai.azure.com/anthropic/v1/messages?beta=true "HTTP/1.1 200 OK"
+2026-04-20 21:10:55 INFO    app.api.chat: chat stream done events_total=25 events_emitted=22

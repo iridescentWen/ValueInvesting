@@ -1,12 +1,10 @@
+"use client";
+
 import { MessageSquareIcon } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
+import { useT } from "@/lib/i18n";
 
-/**
- * Phase 0 的占位 workspace 组件——每个路由页面只显示标题 + 描述，
- * 证明 WorkspaceShell 复用 + 路由切换 OK。
- * Phase 1/2 逐步替换为真实内容。
- */
 export function WorkspacePlaceholder({
   title,
   description,
@@ -14,6 +12,7 @@ export function WorkspacePlaceholder({
   title: string;
   description: string;
 }) {
+  const t = useT();
   return (
     <div className="mx-auto flex max-w-3xl flex-col gap-6 p-8">
       <div>
@@ -22,15 +21,15 @@ export function WorkspacePlaceholder({
       </div>
 
       <div className="rounded-lg border border-dashed p-8 text-center text-sm text-muted-foreground">
-        <p>Phase 0：仅布局壳</p>
+        <p>{t("placeholder_page.phase0_note")}</p>
         <div className="mt-1 flex flex-wrap items-center justify-center gap-x-1 gap-y-2">
-          <span>打开右侧</span>
+          <span>{t("placeholder_page.open_right")}</span>
           <ChatHintButton />
-          <span>试试 demo artifact · 按</span>
+          <span>{t("placeholder_page.try_artifact")}</span>
           <kbd className="rounded border bg-muted px-1.5 py-0.5 font-mono text-xs">
             ⌘K
           </kbd>
-          <span>打开命令面板</span>
+          <span>{t("placeholder_page.open_cmd_palette")}</span>
         </div>
       </div>
     </div>
@@ -38,6 +37,7 @@ export function WorkspacePlaceholder({
 }
 
 function ChatHintButton() {
+  const t = useT();
   return (
     <Button
       variant="ghost"
@@ -46,7 +46,7 @@ function ChatHintButton() {
       disabled
     >
       <MessageSquareIcon className="size-3" />
-      Chat
+      {t("chat.header")}
     </Button>
   );
 }
